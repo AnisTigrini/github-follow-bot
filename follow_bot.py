@@ -1,27 +1,29 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+import json
 
-# Firefox used
-driver = webdriver.Chrome()
-# base url
+driver = webdriver.Firefox()
+
 driver.get("http://github.com/login")
-
 username = driver.find_element(By.ID, "login_field")
 password = driver.find_element(By.ID, "password")
 
-# password and username need to go into these values
-username.send_keys("enter email")
+username.send_keys("TBD")
 time.sleep(1)
-password.send_keys("enter password")
+password.send_keys("TBD")
 time.sleep(1)
 
 login_form = driver.find_element(By.XPATH, "//input[@value='Sign in']")
 time.sleep(1)
 login_form.click()
-time.sleep(20)
+time.sleep(5)
 
-# These are some of the most popular users on github
+number = driver.find_element(By.XPATH, "//h3[@data-target='sudo-credential-options.githubMobileChallengeValue']")
+print(number.get_attribute("innerHTML"))
+
+time.sleep(15)
+
 prepend = ["jashkenas", "ruanyf", "substack", "kennethreitz", "jlord", "daimajia", "mdo", "schacon", "mattt",
            "sindresorhus", "defunkt", "douglascrockford", "mbostock", "jeresig",
            "mojombo", "addyosmani", "paulirish", "vczh", "romannurik", "tenderlove", "chriscoyier", "johnpapa",
@@ -32,23 +34,33 @@ prepend = ["jashkenas", "ruanyf", "substack", "kennethreitz", "jlord", "daimajia
            "cloudwu", "mitsuhiko", "michaelliao", "ryanb", "clowwindy", "JacksonTian", "yinwang0", "Trinea",
            "pjhyett", "dhh", "gaearon"]
 
-for user in prepend:
-    for t in range(1, 100):
-        string = "https://github.com/{}/?page={}&tab=followers".format(user, t)
-        print("Following user {} in page {}".format(user, t))
-        
-        driver.get(string)
-        time.sleep(5)
+with open('data.json', 'r') as file:
+    data = json.load(file)
 
-        follow_button = driver.find_elements(By.XPATH, "//input[@type='submit'][@value='Follow']")
+currentUser = data["user"]
+currentPage = data["page"]
 
-        print("Follow butrto", follow_button)
-        # Once page is loaded this clicks all buttons for follow
-        try:
-            for i in follow_button:
-                i.submit()
-                time.sleep(2)
-        except:
-            pass
+try:
+    for user in prepend:
+        if (currentUser == data['user']):
+            while (currentPage < currentPage + 3):
+                string = "https://github.com/{}/?page={}&tab=followers".format(user, currentPage)
+                
+                driver.get(string)
+                time.sleep(15)
 
-driver.close()
+                follow_button = driver.find_elements(By.XPATH, "//input[@type='submit'][@value='Follow']")
+
+                for i in follow_button:
+                    i.submit()
+                    time.sleep(2)
+                
+                currentPage += 1
+
+    driver.close()
+    raise Exception("End of script")
+except:
+    data["page"] = currentPage
+
+    with open('data.json', 'w') as file:
+        json.dump(data, file, indent=4)  # Use indent for pretty formatting
