@@ -2,8 +2,11 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 import json
+from selenium.webdriver.firefox.options import Options
 
-driver = webdriver.Firefox()
+options = Options()
+options.headless = True
+driver = webdriver.Firefox(options=options)
 
 driver.get("http://github.com/login")
 username = driver.find_element(By.ID, "login_field")
