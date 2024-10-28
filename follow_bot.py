@@ -42,11 +42,12 @@ with open('data.json', 'r') as file:
 
 currentUser = data["user"]
 currentPage = data["page"]
+maxPage = currentPage + 5
 
 try:
     for user in prepend:
         if (currentUser == data['user']):
-            while (currentPage < currentPage + 3):
+            while (currentPage < maxPage):
                 string = "https://github.com/{}/?page={}&tab=followers".format(user, currentPage)
                 
                 driver.get(string)
