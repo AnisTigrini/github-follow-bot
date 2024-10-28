@@ -49,7 +49,7 @@ try:
         if (currentUser == data['user']):
             while (currentPage < maxPage):
                 string = "https://github.com/{}/?page={}&tab=followers".format(user, currentPage)
-                
+                print (string)
                 driver.get(string)
                 time.sleep(15)
 
